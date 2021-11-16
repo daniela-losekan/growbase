@@ -9,6 +9,7 @@ import PreviewConfig from 'app/main/preview/PreviewConfig';
 import HomeConfig from 'app/main/home/HomeConfig';
 import ForgotPasswordConfig from 'app/main/forgot-password/ForgotPasswordConfig';
 import ProductsConfig from 'app/main/products/ProductsConfig';
+import CategoriesConfig from 'app/main/categories/CategoriesConfig';
 
 const routeConfigs = [
 	ExampleConfig,
@@ -18,7 +19,8 @@ const routeConfigs = [
 	PreviewConfig,
 	ForgotPasswordConfig,
 	HomeConfig,
-	ProductsConfig
+	ProductsConfig,
+	CategoriesConfig
 ];
 
 const routes = [

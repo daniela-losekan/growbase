@@ -8,7 +8,7 @@ import PageCardedHeader from 'app/fuse-layouts/shared-components/page-carded-hea
 import Header from './Header';
 import Content from './Content';
 
-function Product() {
+function Message() {
 	const dispatch = useDispatch();
 
 	return (
@@ -32,4 +32,4 @@ function Product() {
 	);
 }
 
-export default Product;
+export default Message;

@@ -123,7 +123,7 @@ function Layout1(props) {
 
 									{config.footer.display && config.footer.position === 'below' && <FooterLayout1 />}
 
-									<SettingsPanel />
+									{/* <SettingsPanel /> */}
 								</div>
 
 								{config.navbar.display && config.navbar.position === 'right' && (
@@ -184,7 +184,7 @@ function Layout1(props) {
 									config.footer.position === 'below' &&
 									config.footer.style === 'fixed' && <FooterLayout1 />}
 
-								<SettingsPanel />
+								{/* <SettingsPanel /> */}
 							</div>
 
 							{config.navbar.display && config.navbar.position === 'right' && <NavbarWrapperLayout1 />}

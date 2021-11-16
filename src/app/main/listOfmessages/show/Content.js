@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
@@ -14,14 +15,13 @@ import { showMessage } from 'app/store/fuse/messageSlice';
 import objectsKeysEquals from 'app/utils/validations/objectsKeysEquals';
 import ButtonDefault from 'app/fuse-layouts/shared-components/button-default/ButtonDeafault';
 import { Grid, InputAdornment, MenuItem } from '@material-ui/core';
-
-import { saveOne, newData, getOne, updateOne, updateResponse, updateLoading } from '../store/productSlice';
+import { deleteOne, getOne, newData, saveOne, updateLoading, updateOne, updateResponse } from '../store/messageSlice';
 
 function Content() {
 	const dispatch = useDispatch();
 	const routeParams = useParams();
 	const history = useHistory();
-	const productRedux = useSelector(({ product }) => product);
+	const messageRedux = useSelector(({ message }) => message);
 
 	const [contents, setContents] = useState([]);
 	const [selectedContents, setSelectedContents] = useState([]);
@@ -43,12 +43,12 @@ function Content() {
 	}, [dispatch, routeParams]);
 
 	useEffect(() => {
-		if (productRedux) {
+		if (messageRedux) {
 			if (loading) {
-				setLoading(productRedux.loading);
+				setLoading(messageRedux.loading);
 			}
 		}
-	}, [productRedux]);
+	}, [messageRedux]);
 
 	useEffect(() => {
 		function clear() {
@@ -57,16 +57,16 @@ function Content() {
 
 			if (id === 'new') {
 				dispatch(newData());
-				history.push('/products/new');
+				history.push('/message/new');
 			} else {
 				dispatch(updateResponse({ message: '', success: false }));
 			}
 		}
 
-		if (productRedux?.message && !productRedux?.success) {
+		if (messageRedux?.message) {
 			dispatch(
 				showMessage({
-					message: productRedux?.message,
+					message: messageRedux?.message,
 					autoHideDuration: 6000,
 					anchorOrigin: {
 						vertical: 'top',
@@ -78,10 +78,10 @@ function Content() {
 
 			clear();
 		}
-		if (productRedux?.message && productRedux?.success) {
+		if (messageRedux?.message) {
 			dispatch(
 				showMessage({
-					message: productRedux?.message,
+					message: messageRedux?.message,
 					autoHideDuration: 6000,
 					anchorOrigin: {
 						vertical: 'top',
@@ -93,7 +93,7 @@ function Content() {
 
 			clear();
 		}
-	}, [productRedux.success, productRedux.message]);
+	}, [messageRedux.message]);
 
 	function canBeSubmitted(modal) {
 		if (modal) {
@@ -102,9 +102,9 @@ function Content() {
 			if (modal === true) {
 				diff = isFormValid;
 			} else {
-				diff = objectsKeysEquals(modal, productRedux);
+				diff = objectsKeysEquals(modal, messageRedux);
 			}
-			const diffContents = productRedux?.contents?.length !== selectedContents.length;
+			const diffContents = messageRedux?.length !== selectedContents.length;
 
 			if ((diff || diffContents) && !isFormValid) {
 				setIsFormValid(true);
@@ -124,11 +124,24 @@ function Content() {
 		setLoading(true);
 		dispatch(updateLoading(true));
 
-		if (productRedux?.id !== 'new') {
-			dispatch(updateOne({ data: modal, id: productRedux?.id }));
+		if (messageRedux?.id !== 'new') {
+			dispatch(updateOne({ data: modal, id: messageRedux?.id }));
+			setTimeout(function pushHistory() {
+				history.push('/message');
+			}, 3000);
 		} else {
 			dispatch(saveOne(modal));
+			setTimeout(function pushHistory() {
+				history.push('/message');
+			}, 3000);
 		}
+	}
+
+	function Delete() {
+		dispatch(deleteOne({ id: messageRedux?.id }));
+		setTimeout(function pushHistory() {
+			history.push('/message');
+		}, 3000);
 	}
 
 	function handleSelect(value) {
@@ -142,7 +155,7 @@ function Content() {
 		setIsFormValid(true);
 	}
 
-	if (!productRedux?.id && loading) {
+	if (!messageRedux?.id && loading) {
 		return <FuseLoading />;
 	}
 
@@ -157,75 +170,40 @@ function Content() {
 				>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Nome"
+						label="Title"
 						type="text"
 						name="title"
-						value={productRedux.title}
+						value={messageRedux.title}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com o nome' }}
+						validationErrors={{ minLength: 'Please, put some title for the message' }}
 						fullWidth
 						autoFocus
 						required
 					/>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Descrição"
+						label="Description"
 						type="text"
 						name="description"
-						value={productRedux.description}
+						value={messageRedux.description}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com a descrição' }}
+						validationErrors={{ minLength: 'Please, put some description for the message' }}
 						fullWidth
 						required
 					/>
-
-					<TextFieldFormsy
-						className="mb-16 w-full"
-						label="Preço"
-						type="text"
-						name="price"
-						value={productRedux.price}
-						mask={['9,99', '99,99', '999,99', '9.999,99']}
-						validations={{
-							matchRegexp: /^(\d{0,1}\.?\d{1,3},\d{2}$)/
-						}}
-						validationErrors={{ matchRegexp: 'Informe o preço' }}
-						InputProps={{
-							startAdornment: <InputAdornment position="start">R$</InputAdornment>
-						}}
-						variant="outlined"
-						fullWidth
-						required
-					/>
-
-					{/* <SelectFormsy
-						className="mb-16 w-full"
-						label="Recorrência"
-						type="select"
-						name="payment"
-						value={plan.payment}
-						variant="outlined"
-						fullWidth
-					>
-						<MenuItem value="" disabled>
-							Escolha a recorrência
-						</MenuItem>
-						{recurrences.map(item => (
-							<MenuItem value={item.value}>{item.label}</MenuItem>
-						))}
-					</SelectFormsy> */}
 
 					<Grid container item className="flex justify-end items-end">
 						<Grid item xs={7} sm={5} md={4} lg={3} xl={2}>
 							<ButtonDefault
 								fullWidth
 								type="submit"
-								title="Salvar"
+								title="Save"
 								loading={loading}
 								disabled={!isFormValid}
 							/>
+							<ButtonDefault fullWidth action={Delete} title="Delete" />
 						</Grid>
 					</Grid>
 				</Formsy>
