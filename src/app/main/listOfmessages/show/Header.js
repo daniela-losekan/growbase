@@ -14,7 +14,7 @@ function Header() {
 		}
 	}, [messageRedux]);
 
-	return <PageCardedHeader link="/recado" title={message?.titulo || 'New message'} textBack="Messages" />;
+	return <PageCardedHeader link="/message" title={message?.titulo || 'New message'} textBack="Messages" />;
 }
 
 export default Header;
